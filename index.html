@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="th">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Everline Barber Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="topbar">
+        <div>
+          <p class="eyebrow">Everline Barber</p>
+          <h1>Dashboard รายรับรายจ่าย</h1>
+        </div>
+        <div class="status-card">
+          <span class="status-dot" id="syncDot"></span>
+          <span id="syncStatus">ใช้ข้อมูลตัวอย่าง</span>
+        </div>
+      </section>
+
+      <section class="controls" aria-label="ตัวกรองข้อมูล">
+        <label>
+          ช่วงเวลา
+          <select id="periodFilter">
+            <option value="day">รายวัน</option>
+            <option value="week">รายสัปดาห์</option>
+            <option value="month">รายเดือน</option>
+          </select>
+        </label>
+        <label>
+          <span id="periodValueLabel">เลือกวันที่</span>
+          <input id="periodValue" type="date" />
+        </label>
+        <label>
+          ช่าง
+          <select id="barberFilter">
+            <option value="all">ทุกคน</option>
+          </select>
+        </label>
+        <label>
+          Google Sheets URL
+          <input
+            id="sheetUrl"
+            type="url"
+            placeholder="วางลิงก์ Google Sheets หรือ publish CSV"
+          />
+        </label>
+        <button id="loadSheet" type="button">โหลดข้อมูล</button>
+      </section>
+
+      <section class="metric-grid" aria-label="สรุปภาพรวม">
+        <article class="metric income">
+          <span>รายรับรวม</span>
+          <strong id="totalIncome">฿0</strong>
+        </article>
+        <article class="metric expense">
+          <span>รายจ่ายรวม</span>
+          <strong id="totalExpense">฿0</strong>
+        </article>
+        <article class="metric net">
+          <span>สุทธิ</span>
+          <strong id="netIncome">฿0</strong>
+        </article>
+        <article class="metric">
+          <span>จำนวนรายการ</span>
+          <strong id="totalRows">0</strong>
+        </article>
+      </section>
+
+      <section class="dashboard-grid">
+        <article class="panel chart-panel">
+          <div class="panel-head">
+            <div>
+              <h2>ยอดต่อช่าง</h2>
+              <p id="rangeLabel">-</p>
+            </div>
+          </div>
+          <canvas id="barberChart" height="135"></canvas>
+        </article>
+
+        <article class="panel">
+          <div class="panel-head">
+            <div>
+              <h2>ช่องทางรับเงิน</h2>
+              <p>โอนเงินและเงินสด</p>
+            </div>
+          </div>
+          <div class="payment-list" id="paymentList"></div>
+        </article>
+      </section>
+
+      <section class="panel table-panel">
+        <div class="panel-head">
+          <div>
+            <h2>รายการล่าสุด</h2>
+            <p>คอลัมน์: วันที่, รายการ, ราคา, โอนเงิน/เงินสด, ช่าง, หมายเหตุ</p>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>วันที่</th>
+                <th>รายการ</th>
+                <th>ราคา</th>
+                <th>ช่องทาง</th>
+                <th>ช่าง</th>
+                <th>หมายเหตุ</th>
+              </tr>
+            </thead>
+            <tbody id="rowsTable"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="./app.js"></script>
+  </body>
+</html>
