@@ -39,9 +39,8 @@ https://docs.google.com/spreadsheets/d/1setAb6jom6c8K7ydKDvVgrvPq73_0ZXkkI6gtasZ
 
 1. เปิด Google Sheets ที่มีหัวคอลัมน์ตามตัวอย่าง
 2. Copy ลิงก์ Google Sheets แบบปกติ หรือ URL ที่ publish เป็น CSV
-3. วาง URL ในช่อง `Google Sheets URL`
-4. กด `โหลดข้อมูล`
+3. แก้ค่า `defaultSheetUrl` ใน `app.js`
 
-หลังโหลดแล้วหน้าเว็บจะ refresh ข้อมูลจาก URL เดิมทุก 30 วินาที
+หน้าเว็บจะ refresh ข้อมูลทุก 30 วินาที
 
 หมายเหตุ: วิธีนี้เหมาะกับ sheet ที่แชร์ให้อ่านได้แบบ public หรือ publish แล้ว ถ้าต้องการข้อมูล private พร้อม login ควรเพิ่ม backend และ Google Sheets API ในขั้นถัดไป

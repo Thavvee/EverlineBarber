@@ -32,8 +32,6 @@ const els = {
   periodValue: document.querySelector("#periodValue"),
   periodValueLabel: document.querySelector("#periodValueLabel"),
   barber: document.querySelector("#barberFilter"),
-  sheetUrl: document.querySelector("#sheetUrl"),
-  loadSheet: document.querySelector("#loadSheet"),
   totalIncome: document.querySelector("#totalIncome"),
   totalExpense: document.querySelector("#totalExpense"),
   netIncome: document.querySelector("#netIncome"),
@@ -307,7 +305,7 @@ function normalizeDate(value) {
 }
 
 async function loadSheet() {
-  const url = els.sheetUrl.value.trim();
+  const url = defaultSheetUrl;
   if (!url) return;
   els.syncStatus.textContent = "กำลังโหลดข้อมูล";
   const response = await fetch(toGoogleSheetCsvUrl(url), { cache: "no-store" });
@@ -321,7 +319,7 @@ async function loadSheet() {
 function startPolling() {
   clearInterval(state.pollTimer);
   state.pollTimer = setInterval(() => {
-    if (els.sheetUrl.value.trim()) loadSheet().catch(showError);
+    loadSheet().catch(showError);
   }, 30000);
 }
 
@@ -391,9 +389,7 @@ els.period.addEventListener("change", () => {
 });
 els.periodValue.addEventListener("change", render);
 els.barber.addEventListener("change", render);
-els.loadSheet.addEventListener("click", () => loadSheet().then(startPolling).catch(showError));
 
 updatePeriodControl();
 render();
-els.sheetUrl.value = defaultSheetUrl;
 loadSheet().then(startPolling).catch(showError);
