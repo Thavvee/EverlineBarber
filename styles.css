@@ -180,6 +180,10 @@ button {
   margin-bottom: 14px;
 }
 
+.chart-panel {
+  grid-row: span 2;
+}
+
 .panel {
   padding: 18px;
 }
@@ -201,21 +205,30 @@ button {
   font-size: 0.86rem;
 }
 
-.payment-list {
+.payment-list,
+.salary-list {
   display: grid;
   gap: 12px;
 }
 
-.payment-row {
+.payment-row,
+.salary-row {
   display: grid;
   gap: 7px;
 }
 
-.payment-row header {
+.payment-row header,
+.salary-row header {
   display: flex;
+  align-items: center;
   justify-content: space-between;
   gap: 10px;
   font-weight: 800;
+}
+
+.salary-row strong {
+  color: var(--green);
+  white-space: nowrap;
 }
 
 .track {
@@ -229,6 +242,10 @@ button {
   height: 100%;
   border-radius: inherit;
   background: var(--blue);
+}
+
+.salary-fill {
+  background: var(--green);
 }
 
 .table-panel {

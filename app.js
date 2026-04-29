@@ -38,6 +38,7 @@ const els = {
   totalRows: document.querySelector("#totalRows"),
   rangeLabel: document.querySelector("#rangeLabel"),
   paymentList: document.querySelector("#paymentList"),
+  barberSalaryList: document.querySelector("#barberSalaryList"),
   rowsTable: document.querySelector("#rowsTable"),
   syncDot: document.querySelector("#syncDot"),
   syncStatus: document.querySelector("#syncStatus"),
@@ -196,6 +197,37 @@ function renderPayments(rows) {
     .join("");
 }
 
+function renderBarberSalaries(rows) {
+  const grouped = rows.reduce((acc, row) => {
+    const name = row.barber || "-";
+    const value = Math.max(total(row), 0);
+    if (!value || name === "ร้าน" || name === "-") return acc;
+    acc[name] = (acc[name] || 0) + value;
+    return acc;
+  }, {});
+
+  const entries = Object.entries(grouped).sort((a, b) => b[1] - a[1]);
+  if (!entries.length) {
+    els.barberSalaryList.innerHTML = '<p>ไม่มีรายรับของช่างในช่วงเวลานี้</p>';
+    return;
+  }
+
+  const max = Math.max(...entries.map(([, value]) => value), 1);
+  els.barberSalaryList.innerHTML = entries
+    .map(
+      ([name, value]) => `
+        <div class="salary-row">
+          <header>
+            ${renderBadge(name, "barber")}
+            <strong>${money.format(value)}</strong>
+          </header>
+          <div class="track"><div class="fill salary-fill" style="width:${(value / max) * 100}%"></div></div>
+        </div>
+      `,
+    )
+    .join("");
+}
+
 function renderTable(rows) {
   if (!rows.length) {
     els.rowsTable.innerHTML = '<tr><td colspan="6">ไม่มีข้อมูลในช่วงเวลานี้</td></tr>';
@@ -228,6 +260,7 @@ function render() {
   renderMetrics(rows);
   renderChart(rows);
   renderPayments(rows);
+  renderBarberSalaries(rows);
   renderTable(rows);
 }
 
