@@ -20,6 +20,7 @@ const sampleRows = [
 
 const defaultSheetUrl =
   "https://docs.google.com/spreadsheets/d/1setAb6jom6c8K7ydKDvVgrvPq73_0ZXkkI6gtasZNbI/edit?gid=0#gid=0";
+const defaultSheetName = "Everline Barber Google Sheet";
 
 const state = {
   rows: sampleRows,
@@ -32,6 +33,8 @@ const els = {
   periodValue: document.querySelector("#periodValue"),
   periodValueLabel: document.querySelector("#periodValueLabel"),
   barber: document.querySelector("#barberFilter"),
+  sheetName: document.querySelector("#sheetName"),
+  fetchSheet: document.querySelector("#fetchSheet"),
   totalIncome: document.querySelector("#totalIncome"),
   totalExpense: document.querySelector("#totalExpense"),
   netIncome: document.querySelector("#netIncome"),
@@ -340,13 +343,18 @@ function normalizeDate(value) {
 async function loadSheet() {
   const url = defaultSheetUrl;
   if (!url) return;
+  els.fetchSheet.disabled = true;
   els.syncStatus.textContent = "กำลังโหลดข้อมูล";
-  const response = await fetch(toGoogleSheetCsvUrl(url), { cache: "no-store" });
-  if (!response.ok) throw new Error("โหลด Google Sheets CSV ไม่สำเร็จ");
-  state.rows = parseCsv(await response.text());
-  els.syncDot.classList.add("live");
-  els.syncStatus.textContent = `อัปเดตล่าสุด ${new Date().toLocaleTimeString("th-TH")}`;
-  render();
+  try {
+    const response = await fetch(toGoogleSheetCsvUrl(url), { cache: "no-store" });
+    if (!response.ok) throw new Error("โหลด Google Sheets CSV ไม่สำเร็จ");
+    state.rows = parseCsv(await response.text());
+    els.syncDot.classList.add("live");
+    els.syncStatus.textContent = `อัปเดตล่าสุด ${new Date().toLocaleTimeString("th-TH")}`;
+    render();
+  } finally {
+    els.fetchSheet.disabled = false;
+  }
 }
 
 function startPolling() {
@@ -422,7 +430,9 @@ els.period.addEventListener("change", () => {
 });
 els.periodValue.addEventListener("change", render);
 els.barber.addEventListener("change", render);
+els.fetchSheet.addEventListener("click", () => loadSheet().catch(showError));
 
 updatePeriodControl();
+els.sheetName.textContent = defaultSheetName;
 render();
 loadSheet().then(startPolling).catch(showError);

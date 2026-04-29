@@ -33,7 +33,7 @@ Prototype dashboard สำหรับดูรายรับรายจ่า
 https://docs.google.com/spreadsheets/d/1setAb6jom6c8K7ydKDvVgrvPq73_0ZXkkI6gtasZNbI/edit?gid=0#gid=0
 ```
 
-เปิด `index.html` แล้วระบบจะโหลดข้อมูลจากชีตนี้ทันที และ refresh ข้อมูลทุก 30 วินาที
+เปิด `index.html` แล้วระบบจะโหลดข้อมูลจากชีตนี้ทันที มีปุ่ม `Fetch ข้อมูล` สำหรับดึงข้อมูลใหม่เอง และ refresh ข้อมูลทุก 30 วินาที
 
 ถ้าต้องการเปลี่ยน datasource:
 

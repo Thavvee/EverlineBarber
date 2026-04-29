@@ -98,12 +98,13 @@ h1 {
 }
 
 .controls {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr)) minmax(280px, 1.4fr);
   align-items: end;
   margin-bottom: 16px;
 }
 
-label {
+label,
+.datasource-control {
   display: grid;
   gap: 6px;
   color: var(--muted);
@@ -129,6 +130,40 @@ button {
   color: #fff;
   cursor: pointer;
   font-weight: 800;
+}
+
+button:disabled {
+  cursor: wait;
+  opacity: 0.68;
+}
+
+.datasource-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  padding: 6px;
+}
+
+.datasource-row strong {
+  min-width: 0;
+  overflow: hidden;
+  padding: 0 6px;
+  color: var(--ink);
+  font-size: 0.92rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.datasource-row button {
+  width: auto;
+  min-height: 32px;
+  padding: 5px 12px;
+  white-space: nowrap;
 }
 
 .metric-grid {
@@ -337,6 +372,7 @@ td {
     grid-template-columns: 1fr 1fr;
   }
 
+  .datasource-control,
   .chart-panel,
   .table-panel {
     grid-column: 1 / -1;
