@@ -1,46 +1,102 @@
-# Everline Barber Dashboard Prototype
+# Everline Barber Dashboard
 
-Prototype dashboard สำหรับดูรายรับรายจ่ายรายวัน รายสัปดาห์ และรายเดือน โดยใช้คอลัมน์ข้อมูล:
-
-```text
-วันที่ | รายการ | ราคา | (โอนเงิน,เงินสด) | ช่าง | หมายเหตุ
-```
-
-## วิธีเปิดดู
-
-เปิดไฟล์ `index.html` ใน browser ได้ทันที
-
-## รูปแบบข้อมูล
-
-- `วันที่`: แนะนำให้ใช้ `YYYY-MM-DD` เช่น `2026-04-29`
-- `ราคา`: ใส่ยอดรวมของรายการนั้น
-- รายรับ: ใส่ราคาเป็นค่าบวก เช่น `300`
-- รายจ่าย: ใส่ราคาเป็นค่าติดลบ เช่น `-850`
-
-ตัวอย่าง:
+Dashboard สำหรับดูรายรับรายจ่ายรายวัน รายสัปดาห์ และรายเดือน โดยใช้ SQL database เป็น datasource
 
 ```text
-วันที่,รายการ,ราคา,(โอนเงิน,เงินสด),ช่าง,หมายเหตุ
-2026-04-29,ตัดผมชาย,300,เงินสด,ช่างแบงค์,
-2026-04-29,ค่าอุปกรณ์,-850,โอนเงิน,ร้าน,รายจ่ายร้าน
+วันที่ | รายการ | ราคา | ช่องทาง | ช่าง | หมายเหตุ
 ```
 
-## เชื่อม Google Sheets
+## ติดตั้งและรัน
 
-ไฟล์นี้ตั้งค่า datasource เริ่มต้นเป็น Google Sheets นี้แล้ว:
+1. ติดตั้ง dependencies
+
+```bash
+npm install
+```
+
+2. สร้าง database/table ด้วยไฟล์ `schema.sql`
+
+```bash
+mysql -u root -p < schema.sql
+```
+
+3. สร้างไฟล์ `.env` จาก `.env.example` แล้วแก้ค่าการเชื่อมต่อฐานข้อมูล
 
 ```text
-https://docs.google.com/spreadsheets/d/1setAb6jom6c8K7ydKDvVgrvPq73_0ZXkkI6gtasZNbI/edit?gid=0#gid=0
+PORT=3000
+DB_HOST=localhost
+DB_PORT=3306
+DB_USER=root
+DB_PASSWORD=
+DB_NAME=everline_barber
+DB_TABLE=transactions
+APP_BASE_URL=http://localhost:3000
+LINE_CHANNEL_ID=
+LINE_CHANNEL_SECRET=
+LINE_REDIRECT_URI=http://localhost:3000/auth/line/callback
+SESSION_SECRET=change-this-to-a-long-random-string
 ```
 
-เปิด `index.html` แล้วระบบจะโหลดข้อมูลจากชีตนี้ทันที มีปุ่ม `Fetch ข้อมูล` สำหรับดึงข้อมูลใหม่เอง และ refresh ข้อมูลทุก 30 วินาที
+4. ตั้งค่า LINE Login
 
-ถ้าต้องการเปลี่ยน datasource:
+- สร้าง LINE Login channel ใน LINE Developers Console
+- ตั้ง Callback URL เป็น `http://localhost:3000/auth/line/callback` สำหรับเครื่อง local
+- นำ Channel ID ใส่ `LINE_CHANNEL_ID`
+- นำ Channel secret ใส่ `LINE_CHANNEL_SECRET`
+- เปลี่ยน `SESSION_SECRET` เป็นข้อความสุ่มยาว ๆ
 
-1. เปิด Google Sheets ที่มีหัวคอลัมน์ตามตัวอย่าง
-2. Copy ลิงก์ Google Sheets แบบปกติ หรือ URL ที่ publish เป็น CSV
-3. แก้ค่า `defaultSheetUrl` ใน `app.js`
+5. Build React app
 
-หน้าเว็บจะ refresh ข้อมูลทุก 30 วินาที
+```bash
+npm run build
+```
 
-หมายเหตุ: วิธีนี้เหมาะกับ sheet ที่แชร์ให้อ่านได้แบบ public หรือ publish แล้ว ถ้าต้องการข้อมูล private พร้อม login ควรเพิ่ม backend และ Google Sheets API ในขั้นถัดไป
+6. เปิด server
+
+```bash
+npm start
+```
+
+แล้วเข้าใช้งานที่ `http://localhost:3000`
+
+ระหว่างพัฒนา frontend สามารถใช้ Vite ได้:
+
+```bash
+npm run dev
+```
+
+โดยต้องเปิด backend `npm start` ไว้ด้วย เพื่อให้ proxy ไปยัง SQL API และ LINE Login routes
+
+## รูปแบบตาราง SQL
+
+ตารางเริ่มต้นชื่อ `transactions`
+
+```sql
+CREATE TABLE transactions (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  date DATE NOT NULL,
+  item VARCHAR(255) NOT NULL,
+  price DECIMAL(12, 2) NOT NULL,
+  payment VARCHAR(80) NOT NULL,
+  barber VARCHAR(120) NOT NULL,
+  note TEXT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id)
+);
+```
+
+- `date`: วันที่รายการ เช่น `2026-04-29`
+- `price`: รายรับเป็นค่าบวก เช่น `300`, รายจ่ายเป็นค่าติดลบ เช่น `-850`
+- `payment`: ช่องทางรับ/จ่ายเงิน เช่น `เงินสด`, `โอนเงิน`
+- `barber`: ชื่อช่าง หรือ `ร้าน` สำหรับรายจ่ายร้าน
+
+หน้าเว็บจะดึงข้อมูลจาก endpoint `/api/transactions` และ refresh ทุก 30 วินาที
+
+## LINE Login
+
+ระบบบังคับ login ด้วย LINE ก่อนเสมอ
+
+- ถ้ายังไม่ login แล้วเข้า `/` หรือไฟล์หน้าเว็บ จะถูกส่งไป `/login`
+- ถ้ายังไม่ login แล้วเรียก `/api/transactions` จะได้ `401 LINE login required`
+- หลัง login สำเร็จ ระบบจะเก็บ session ไว้ใน cookie ชื่อ `everline.sid`
+- ออกจากระบบได้ด้วย `POST /logout`
